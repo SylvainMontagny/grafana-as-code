@@ -124,7 +124,7 @@ local createsOverrides(measurements=config.measurements) =
         + timeSeries.fieldConfig.defaults.custom.withFillOpacity(0)
         + timeSeries.fieldConfig.defaults.custom.withGradientMode('none')
         + timeSeries.fieldConfig.defaults.custom.withHideFrom({ legend: false, tooltip: false, viz: false })
-        + timeSeries.fieldConfig.defaults.custom.withInsertNulls(3600000)
+        + timeSeries.fieldConfig.defaults.custom.withInsertNulls(14400000)
         + timeSeries.fieldConfig.defaults.custom.withLineInterpolation('linear')
         + timeSeries.fieldConfig.defaults.custom.withLineWidth(1)
         + timeSeries.fieldConfig.defaults.custom.withScaleDistribution({
@@ -167,8 +167,7 @@ local createsOverrides(measurements=config.measurements) =
                 "color": "#f2495c5e",
                 "value": 1500
             }
-        ])
-        + timeSeries.fieldConfig.defaults.custom.withInsertNulls(7200000),
+        ]),
 
     ###################################################################################
     ############################## Row Panel Single view ##############################
@@ -228,7 +227,7 @@ local createsOverrides(measurements=config.measurements) =
                     tooltip: false,
                     viz: false,
                 })
-            + timeSeries.fieldConfig.defaults.custom.withInsertNulls(3600000)
+            + timeSeries.fieldConfig.defaults.custom.withInsertNulls(14400000)
             + timeSeries.fieldConfig.defaults.custom.withLineInterpolation('linear')
             + timeSeries.fieldConfig.defaults.custom.withLineStyle({
                     fill: 'solid'
@@ -309,7 +308,7 @@ local createsOverrides(measurements=config.measurements) =
             + timeSeries.fieldConfig.defaults.custom.hideFrom.withLegend(value=false)
             + timeSeries.fieldConfig.defaults.custom.hideFrom.withTooltip(value=false)
             + timeSeries.fieldConfig.defaults.custom.hideFrom.withViz(value=false)
-            + timeSeries.fieldConfig.defaults.custom.withInsertNulls(value=3600000)
+            + timeSeries.fieldConfig.defaults.custom.withInsertNulls(value=14400000)
             + timeSeries.fieldConfig.defaults.custom.withLineInterpolation(value='linear')
             + timeSeries.fieldConfig.defaults.custom.withLineWidth(value=1)
             + timeSeries.fieldConfig.defaults.custom.withPointSize(value=5)
@@ -386,7 +385,7 @@ local createsOverrides(measurements=config.measurements) =
             + timeSeries.fieldConfig.defaults.custom.hideFrom.withLegend(false)
             + timeSeries.fieldConfig.defaults.custom.hideFrom.withTooltip(false)
             + timeSeries.fieldConfig.defaults.custom.hideFrom.withViz(false)
-            + timeSeries.fieldConfig.defaults.custom.withInsertNulls(3600000)
+            + timeSeries.fieldConfig.defaults.custom.withInsertNulls(14400000)
             + timeSeries.fieldConfig.defaults.custom.withLineInterpolation('linear')
             + timeSeries.fieldConfig.defaults.custom.withLineWidth(1)
             + timeSeries.fieldConfig.defaults.custom.withPointSize(5)
