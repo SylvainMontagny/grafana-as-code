@@ -97,7 +97,7 @@ local createsOverrides(measurements=config.measurements) =
                 id: 'renameByRegex',
                 options: {
                     regex: '.*batiment="(.*?)".*salle="(.*?)".*site="(.*?)".*',
-                    renamePattern: '$2',
+                    renamePattern: '$1 - $2',
                 }
             },
         ])
@@ -105,7 +105,7 @@ local createsOverrides(measurements=config.measurements) =
         + timeSeries.options.withLegend({
             calcs: [],
             displayMode: 'list',
-            placement: 'bottom',
+            placement: 'right',
             showLegend: true,
         })
         + timeSeries.options.withTooltip({
