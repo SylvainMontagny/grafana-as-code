@@ -55,6 +55,21 @@ local createsOverrides(measurements=config.measurements) =
             ],
         }
         for i in std.range(0, std.length(measurements) - 1)
+    ]
+    +
+    [
+        {
+            matcher: {
+                id: "byName",
+                options: "Time"
+            },
+            properties: [
+                {
+                    id: "unit",
+                    value: "time:LLLL"
+                }
+            ]
+        }
     ];
 
 # PANELS
@@ -77,7 +92,7 @@ local createsOverrides(measurements=config.measurements) =
     ###############################################################################
     ############################## Time Series panel ##############################
     ###############################################################################
-    local queryMain = 'import \"strings\"\r\n\r\nfrom(bucket: \"Temperature room USMB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"${MEASUREMENT}\" and \"${MEASUREMENT}\" == \"TempC_SHT\")\r\n  |> filter(fn: (r) => exists r[\"site\"] and contains(set: ${SITE:json}, value: strings.toLower(v: r[\"site\"])))\r\n  |> filter(fn: (r) => (exists r[\"batiment\"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r[\"batiment\"]))) or\r\n    (exists r[\"building\"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r[\"building\"]))))\r\n  |> filter(fn: (r) => (exists r[\"salle\"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r[\"salle\"]))) or\r\n    (exists r[\"room\"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r[\"room\"]))))\r\n  |> drop(columns: [\"host\", \"applicationName\", \"devEui\", \"deviceName\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> group(columns: []) \/\/ Or union\r\n  |> sort(columns: [\"salle\"], desc: false)\r\n  |> group(columns: [\"salle\", \"batiment\", \"site\"])\r\n',
+    local queryMain = 'import \"strings\"\r\n\r\nfrom(bucket: \"Temperature room USMB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"${MEASUREMENT}\" and \"${MEASUREMENT}\" == \"TempC_SHT\")\r\n  |> filter(fn: (r) => exists r[\"site\"] and contains(set: ${SITE:json}, value: strings.toLower(v: r[\"site\"])))\r\n  |> filter(fn: (r) => (exists r[\"batiment\"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r[\"batiment\"]))) or\r\n    (exists r[\"building\"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r[\"building\"]))))\r\n  |> filter(fn: (r) => (exists r[\"salle\"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r[\"salle\"]))) or\r\n    (exists r[\"room\"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r[\"room\"]))))\r\n  |> keep(columns: ["_value", "_time", "batiment", "salle", "site"])  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n',
     main:
         timeSeries.new('${MEASUREMENT} of ${ROOM}')
         + timeSeries.panelOptions.withRepeat('MEASUREMENT')
@@ -96,7 +111,7 @@ local createsOverrides(measurements=config.measurements) =
                 id: 'renameByRegex',
                 options: {
                     regex: '.*batiment="(.*?)".*salle="(.*?)".*site="(.*?)".*',
-                    renamePattern: '$2',
+                    renamePattern: '$1 - $2',
                 }
             },
         ])
@@ -104,7 +119,7 @@ local createsOverrides(measurements=config.measurements) =
         + timeSeries.options.withLegend({
             calcs: [],
             displayMode: 'list',
-            placement: 'bottom',
+            placement: 'right',
             showLegend: true,
         })
         + timeSeries.options.withTooltip({
@@ -158,7 +173,7 @@ local createsOverrides(measurements=config.measurements) =
     ############################## Row Panel Single view ##############################
     ###################################################################################
 
-    local querySingleView = 'import \"strings\"\r\n\r\nmeasurement = strings.split(v: \"${MEASUREMENT}\", t: \" \")[0]\r\n\r\nfrom(bucket: \"Temperature room USMB\")\r\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"value\")\r\n|> filter(fn: (r) => r[\"_field\"] == measurement and measurement == \"TempC_SHT\")\r\n|> filter(fn: (r) => exists r[\"site\"] and contains(value: strings.toLower(v: r.site), set: ${SITE:json}))\r\n|> filter(fn: (r) => exists r[\"batiment\"] and contains(value: strings.toLower(v: r.batiment), set: ${BUILDING:json}))\r\n|> filter(fn: (r) => exists r[\"salle\"] and (strings.toLower(v: r.salle) == \"${ROOM}\"))\r\n|> drop(columns: [\"host\", \"applicationName\", \"devEui\"])\r\n|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n|> yield(name: \"${MEASUREMENT}\")\r\n',
+    local querySingleView = 'import \"strings\"\r\n\r\nmeasurement = strings.split(v: \"${MEASUREMENT}\", t: \" \")[0]\r\n\r\nfrom(bucket: \"Temperature room USMB\")\r\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"value\")\r\n|> filter(fn: (r) => r[\"_field\"] == measurement and measurement == \"TempC_SHT\")\r\n|> filter(fn: (r) => exists r[\"site\"] and contains(value: strings.toLower(v: r.site), set: ${SITE:json}))\r\n|> filter(fn: (r) => exists r[\"batiment\"] and contains(value: strings.toLower(v: r.batiment), set: ${BUILDING:json}))\r\n|> filter(fn: (r) => exists r[\"salle\"] and (strings.toLower(v: r.salle) == \"${ROOM}\"))\r\n|> keep(columns: ["_value", "_time", "batiment", "salle", "site"])|> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n|> yield(name: \"${MEASUREMENT}\")\r\n',
     
     singleView:
         row.new('Single View')
@@ -247,9 +262,9 @@ local createsOverrides(measurements=config.measurements) =
     ############################## Row Panel Advanced visualization ##############################
     ##############################################################################################
 
-    local queryRSSI = 'import "strings"\n\nfrom(bucket: "Temperature room USMB")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r["_measurement"] == "value")\n  |> filter(fn: (r) => r["_field"] == "rssi")\n  |> filter(fn: (r) => exists r["site"] and contains(set: ${SITE:json}, value: strings.toLower(v: r["site"])))\n  |> filter(fn: (r) => (exists r["batiment"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["batiment"]))) or\n    (exists r["building"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["building"]))))\n  |> filter(fn: (r) => (exists r["salle"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["salle"]))) or\n    (exists r["room"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["room"]))))\n  |> drop(columns: ["host", "gatewayId", "applicationName", "devEui", "deviceName"])\n  |> map(fn: (r) => ({ r with type: "RSSI" }))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)',
-    local querySNR = 'import "strings"\n\nfrom(bucket: "Temperature room USMB")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r["_measurement"] == "value")\n  |> filter(fn: (r) => r["_field"] == "snr")\n  |> filter(fn: (r) => exists r["site"] and contains(set: ${SITE:json}, value: strings.toLower(v: r["site"])))\n  |> filter(fn: (r) => (exists r["batiment"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["batiment"]))) or (exists r["building"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["building"]))))\n  |> filter(fn: (r) => (exists r["salle"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["salle"]))) or (exists r["room"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["room"]))))\n  |> drop(columns: ["host", "gatewayId", "applicationName", "devEui", "deviceName"])\n  |> map(fn: (r) => ({ r with type: "RSSI" }))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)',
-    local querySF = 'import "strings"\n\nfrom(bucket: "Temperature room USMB")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r["_measurement"] == "value")\n  |> filter(fn: (r) => r["_field"] == "modulation_lora_spreadingFactor")\n  |> filter(fn: (r) => exists r["site"] and contains(set: ${SITE:json}, value: strings.toLower(v: r["site"])))\n  |> filter(fn: (r) => (exists r["batiment"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["batiment"]))) or (exists r["building"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["building"]))))\n  |> filter(fn: (r) => (exists r["salle"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["salle"]))) or (exists r["room"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["room"]))))\n  |> drop(columns: ["host", "gatewayId", "applicationName", "devEui", "deviceName"])\n  |> map(fn: (r) => ({ r with type: "RSSI" }))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)',
+    local queryRSSI = 'import "strings"\n\nfrom(bucket: "Temperature room USMB")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r["_measurement"] == "value")\n  |> filter(fn: (r) => r["_field"] == "rssi")\n  |> filter(fn: (r) => exists r["site"] and contains(set: ${SITE:json}, value: strings.toLower(v: r["site"])))\n  |> filter(fn: (r) => (exists r["batiment"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["batiment"]))) or\n    (exists r["building"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["building"]))))\n  |> filter(fn: (r) => (exists r["salle"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["salle"]))) or\n    (exists r["room"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["room"]))))\n  |> keep(columns: ["_value", "_time", "_field", "batiment", "salle", "site"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)',
+    local querySNR = 'import "strings"\n\nfrom(bucket: "Temperature room USMB")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r["_measurement"] == "value")\n  |> filter(fn: (r) => r["_field"] == "snr")\n  |> filter(fn: (r) => exists r["site"] and contains(set: ${SITE:json}, value: strings.toLower(v: r["site"])))\n  |> filter(fn: (r) => (exists r["batiment"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["batiment"]))) or (exists r["building"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["building"]))))\n  |> filter(fn: (r) => (exists r["salle"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["salle"]))) or (exists r["room"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["room"]))))\n  |> keep(columns: ["_value", "_time", "_field", "batiment", "salle", "site"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)',
+    local querySF = 'import "strings"\n\nfrom(bucket: "Temperature room USMB")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r["_measurement"] == "value")\n  |> filter(fn: (r) => r["_field"] == "modulation_lora_spreadingFactor")\n  |> filter(fn: (r) => exists r["site"] and contains(set: ${SITE:json}, value: strings.toLower(v: r["site"])))\n  |> filter(fn: (r) => (exists r["batiment"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["batiment"]))) or (exists r["building"] and contains(set: ${BUILDING:json}, value: strings.toLower(v: r["building"]))))\n  |> filter(fn: (r) => (exists r["salle"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["salle"]))) or (exists r["room"] and contains(set: ${ROOM:json}, value: strings.toLower(v: r["room"]))))\n  |> keep(columns: ["_value", "_time", "_field", "batiment", "salle", "site"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)',
 
     advancedVisualisations:
         row.new('Advanced Visualisations')
@@ -323,6 +338,18 @@ local createsOverrides(measurements=config.measurements) =
                         }
                     ],
                 },
+                {
+                    matcher: {
+                        id: "byName",
+                        options: "Time"
+                    },
+                    properties: [
+                        {
+                            id: "unit",
+                            value: "time:LLLL"
+                        }
+                    ]
+                }
             ])
             + timeSeries.queryOptions.withTransformations([
                 {
@@ -393,6 +420,18 @@ local createsOverrides(measurements=config.measurements) =
                     properties: [
                         { id: 'unit', value: 'dB' },
                     ],
+                },
+                {
+                    matcher: {
+                        id: "byName",
+                        options: "Time"
+                    },
+                    properties: [
+                        {
+                            id: "unit",
+                            value: "time:LLLL"
+                        }
+                    ]
                 }
             ])
             + timeSeries.queryOptions.withTransformations([
@@ -461,7 +500,20 @@ local createsOverrides(measurements=config.measurements) =
                 { color: 'green', value: null },
                 { color: 'red', value: 80 },
             ])
-            + timeSeries.standardOptions.withOverrides([])
+            + timeSeries.standardOptions.withOverrides([
+                {
+                    matcher: {
+                        id: "byName",
+                        options: "Time"
+                    },
+                    properties: [
+                        {
+                            id: "unit",
+                            value: "time:LLLL"
+                        }
+                    ]
+                }
+            ])
             + timeSeries.queryOptions.withTransformations([
                 {
                     id: 'renameByRegex',
