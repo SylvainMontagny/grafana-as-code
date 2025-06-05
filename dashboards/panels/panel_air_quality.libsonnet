@@ -265,7 +265,7 @@ local createsOverrides(measurements=config.measurements) =
             + timeSeries.standardOptions.withMappings([])
             + timeSeries.standardOptions.thresholds.withMode('absolute')
             + timeSeries.standardOptions.thresholds.withSteps([
-                { color: 'green', value: null },
+                { color: 'green' },
                 { color: 'red', value: 30 },
             ])
             + timeSeries.standardOptions.withOverrides(
@@ -371,7 +371,7 @@ local createsOverrides(measurements=config.measurements) =
                     id: 'renameByRegex',
                     options: {
                         regex: '.*batiment="(.*?)".*salle="(.*?)".*site="(.*?)".*',
-                        renamePattern: '$2 - $1 - $3',
+                        renamePattern: '$3- $1 - $2',
                     },
                 }
             ]),
@@ -454,7 +454,7 @@ local createsOverrides(measurements=config.measurements) =
                     id: 'renameByRegex',
                     options: {
                         regex: '.*batiment="(.*?)".*salle="(.*?)".*site="(.*?)".*',
-                        renamePattern: '$2 - $1 - $3',
+                        renamePattern: '$3- $1 - $2',
                     }
                 }
             ]),
@@ -534,7 +534,7 @@ local createsOverrides(measurements=config.measurements) =
                     id: 'renameByRegex',
                     options: {
                     regex: '.*batiment="(.*?)".*salle="(.*?)".*site="(.*?)".*',
-                    renamePattern: '$2 - $1 - $3',
+                    renamePattern: '$3- $1 - $2',
                     }
                 }
             ])
