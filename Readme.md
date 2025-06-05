@@ -21,18 +21,24 @@
 
 ## Initialisation du projet
 
-Installer terraform : https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+**Installer Terraform** : https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
 
-Installer golang : https://go.dev/doc/install
+**Télécharger golang** : 
+* En local https://go.dev/dl/
+* Sur serveur Linux distant `wget https://go.dev/dl/go1.24.3.linux-amd64.tar.gz`
 
-Ajouter `PATH=$PATH:~/go/bin:/usr/local/go/bin` au fichier `~/.profile` ou directement taper la commande dans un terminal.
+**Installer golang** : https://go.dev/doc/install
+
+Ajouter `PATH=$PATH:~/go/bin:/usr/local/go/bin` au fichier `~/.profile` ou directement taper la commande `export PATH=$PATH:/usr/local/go/bin` dans un terminal. Si `go version` ne fonctionne pas, redémarrer la session.
+
+**Installer jsonnet et jsonnet-bundler :**
 
 ```bash
 go install github.com/google/go-jsonnet/cmd/jsonnet@latest
 go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
 ```
 
-Dans le dossier du projet :
+**Installer Grafonnet** dans le dossier du projet avec jsonnet-bundler :
 
 ```bash
 jb install github.com/grafana/grafonnet/gen/grafonnet-latest@main
