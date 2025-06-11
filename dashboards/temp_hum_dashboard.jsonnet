@@ -6,7 +6,12 @@ local grafana = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.l
 local g = grafana;
 # See documentation on how to use functions: https://github.com/grafana/grafonnet/tree/main/gen/grafonnet-v11.4.0#readme
 # And find the wanted package (e.g. panel/timeSeries)
-#local config = import '../config.json';
+
+# For manual testing with jsonnet
+#local fullConfig = import '../config_temp_hum.json';
+#local config = fullConfig.dev;
+
+# For external terraform variable
 local config = std.extVar('temp_hum_dashboard_config');
 
 local dashboard = grafana.dashboard;

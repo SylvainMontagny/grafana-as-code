@@ -7,6 +7,11 @@ local g = grafana;
 # See documentation on how to use functions: https://github.com/grafana/grafonnet/tree/main/gen/grafonnet-v11.4.0#readme
 # And find the wanted package (e.g. panel/timeSeries)
 
+# For manual testing with jsonnet
+#local fullConfig = import '../config_air_quality.json';
+#local config = fullConfig.dev;
+
+# For external terraform variable
 local config = std.extVar('air_quality_dashboard_config');
 
 local dashboard = grafana.dashboard;
