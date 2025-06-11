@@ -6,8 +6,12 @@
 local grafana = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local timeSeries = grafana.panel.timeSeries;
 local row = grafana.panel.row;
-#local config_file = import '../../config.json';
-#local config = config_file.dev;
+
+# For manual testing with jsonnet
+#local fullConfig = import '../config_temp_hum.json';
+#local config = fullConfig.dev;
+
+# For external terraform variable
 local config = std.extVar('temp_hum_dashboard_config');
 
 # Default Grafana dashboard variables
@@ -157,12 +161,6 @@ local createsOverrides(measurements=config.measurements) =
         + timeSeries.standardOptions.withOverrides(
             createsOverrides()
         )
-        + timeSeries.options.withLegend({
-            calcs: [],
-            displayMode: 'list',
-            placement: 'bottom',
-            showLegend: true
-        })
         + timeSeries.options.withTooltip({
             maxHeight: 600,
             mode: 'single',

@@ -6,6 +6,12 @@
 local grafana = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local timeSeries = grafana.panel.timeSeries;
 local row = grafana.panel.row;
+
+# For manual testing with jsonnet
+#local fullConfig = import '../config_air_quality.json';
+#local config = fullConfig.dev;
+
+# For external terraform variable
 local config = std.extVar('air_quality_dashboard_config');
 
 # Default Grafana dashboard variables
@@ -158,12 +164,6 @@ local createsOverrides(measurements=config.measurements) =
         + timeSeries.standardOptions.withOverrides(
             createsOverrides()
         )
-        + timeSeries.options.withLegend({
-            calcs: [],
-            displayMode: 'list',
-            placement: 'bottom',
-            showLegend: true
-        })
         + timeSeries.options.withTooltip({
             maxHeight: 600,
             mode: 'single',

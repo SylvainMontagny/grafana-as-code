@@ -15,7 +15,7 @@
 
 **resource** : objet de l'infrastructure Terraform qui va permettre de créer le dashboard en format JSON et le pousser sur un provider 
 
-**jsonnet** : langage de création de modèle de données permmettant de générer des fichier JSON. C'est une extension du language JSON
+**jsonnet** : langage de création de modèle de données permettant de générer des fichier JSON. C'est une extension du language JSON
 
 **grafonnet** : bibliothèque jsonnet dédiée à la génération de dashboard pour Grafana
 
@@ -98,6 +98,11 @@ terraform apply // ou terraform apply -target=grafana_dashboard.myNewDashboard_p
 ```
 
 Terraform s'occupe de générer le dashboard à partir du fichier jsonnet et le pousse automatiquement sur Grafana.
+
+Pour générer manuellement un dashboard au format JSON, aller dans les fichier dashboard jsonnet et les bibliothèques variables et panels libsonnet pour décommenter les variables locales *fullConfig* et *config*, et commenter la variables locale *config* qui suit, puis aller dans le dossier `dashboards` et taper la commande suivante, à adapter avec le dashboard souhaité :
+``` bash
+jsonnet -J ..\vendor\ .\temp_hum_dashboard.jsonnet -o .\rawDashboard\temp_hum_dashboard.json
+```
 
 ## Configuration
 

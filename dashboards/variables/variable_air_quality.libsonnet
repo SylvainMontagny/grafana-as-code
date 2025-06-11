@@ -4,6 +4,12 @@
 
 local grafana = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local variable = grafana.dashboard.variable;
+
+# For manual testing with jsonnet
+#local fullConfig = import '../config_air_quality.json';
+#local config = fullConfig.dev;
+
+# For external terraform variable
 local config = std.extVar('air_quality_dashboard_config');
 
 # Default Grafana dashboard variables

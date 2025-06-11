@@ -4,7 +4,12 @@
 
 local grafana = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonnet';
 local variable = grafana.dashboard.variable;
-#local config = import '../../config.json';
+
+# For manual testing with jsonnet
+#local fullConfig = import '../config_temp_hum.json';
+#local config = fullConfig.dev;
+
+# For external terraform variable
 local config = std.extVar('temp_hum_dashboard_config');
 
 # Default Grafana dashboard variables
